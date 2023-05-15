@@ -1,2 +1,2 @@
-# simple-telegram-bot-go
-For testing purposes just simple telegram bot
+# Simple Telegram Bot Golang
+For testing purposes just simple echo telegram bot
