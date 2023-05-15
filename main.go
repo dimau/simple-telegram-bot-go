@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"time"
 )
 
 func main() {
@@ -30,6 +31,9 @@ func main() {
 			}
 			offset = update.UpdateId + 1
 		}
+
+		// Timeout
+		time.Sleep(time.Second * 1)
 
 		fmt.Println(updates)
 	}
