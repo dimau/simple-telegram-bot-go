@@ -17,6 +17,8 @@ func main() {
 	telegramBotToken := os.Getenv("TELEGRAM_BOT_TOKEN")
 	telegramApiUrl := "https://api.telegram.org/bot"
 	offset := 0
+	webAppUrl := "https://www.google.ru/"
+	replyKeyboardMarkup := getReplyKeyboardMarkup(webAppUrl)
 
 	for {
 		updates, err := getUpdates(telegramBotToken, telegramApiUrl, offset)
@@ -25,7 +27,7 @@ func main() {
 		}
 
 		for _, update := range updates {
-			err = respond(telegramBotToken, telegramApiUrl, update)
+			err = respond(telegramBotToken, telegramApiUrl, update, replyKeyboardMarkup)
 			if err != nil {
 				log.Println("respond doesn't work: ", err.Error())
 			}
@@ -63,20 +65,42 @@ func getUpdates(botToken string, apiUrl string, offset int) ([]Update, error) {
 }
 
 // Make and send responses
-func respond(botToken string, apiUrl string, update Update) error {
+func respond(botToken string, apiUrl string, update Update, replyKeyboardMarkup ReplyKeyboardMarkup) error {
 	var botMessage BotMessage
 	botMessage.ChatId = update.Message.Chat.Id
 	botMessage.Text = "You asked: " + update.Message.Text
+	botMessage.ReplyMarkup = replyKeyboardMarkup
 
 	buf, err := json.Marshal(botMessage)
 	if err != nil {
 		return err
 	}
 
-	_, err = http.Post(apiUrl+botToken+"/sendMessage", "application/json", bytes.NewBuffer(buf))
+	resp, err := http.Post(apiUrl+botToken+"/sendMessage", "application/json", bytes.NewBuffer(buf))
 	if err != nil {
 		return err
 	}
 
+	fmt.Println(resp)
+
 	return nil
+}
+
+func getReplyKeyboardMarkup(webAppUrl string) ReplyKeyboardMarkup {
+	webAppInfo := WebAppInfo{
+		Url: webAppUrl,
+	}
+
+	keyboardButton := KeyboardButton{
+		Text:   "Open app",
+		WebApp: webAppInfo,
+	}
+
+	keyboardButtonRow := []KeyboardButton{keyboardButton}
+
+	replyKeyboardMarkup := ReplyKeyboardMarkup{
+		Keyboard: [][]KeyboardButton{keyboardButtonRow},
+	}
+
+	return replyKeyboardMarkup
 }
