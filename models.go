@@ -22,9 +22,10 @@ type RestResponse struct {
 }
 
 type BotMessage struct {
-	ChatId      int                 `json:"chat_id"`
-	Text        string              `json:"text"`
-	ReplyMarkup ReplyKeyboardMarkup `json:"reply_markup"`
+	ChatId int    `json:"chat_id"`
+	Text   string `json:"text"`
+	//ReplyMarkup ReplyKeyboardMarkup `json:"reply_markup"`
+	ReplyMarkup InlineKeyboardMarkup `json:"reply_markup"`
 }
 
 type ReplyKeyboardMarkup struct {
@@ -38,4 +39,13 @@ type KeyboardButton struct {
 
 type WebAppInfo struct {
 	Url string `json:"url"`
+}
+
+type InlineKeyboardMarkup struct {
+	Keyboard [][]InlineKeyboardButton `json:"inline_keyboard"`
+}
+
+type InlineKeyboardButton struct {
+	Text   string     `json:"text"`
+	WebApp WebAppInfo `json:"web_app"`
 }

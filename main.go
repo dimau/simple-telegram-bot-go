@@ -14,20 +14,24 @@ import (
 
 func main() {
 	// Get config parameters
-	telegramBotToken := os.Getenv("TELEGRAM_BOT_TOKEN")
+	botToken := os.Getenv("TELEGRAM_BOT_TOKEN")
+	webAppUrl := os.Getenv("WEB_APP_URL")
+
+	// Constant config parameters
 	telegramApiUrl := "https://api.telegram.org/bot"
 	offset := 0
-	webAppUrl := "https://www.google.ru/"
-	replyKeyboardMarkup := getReplyKeyboardMarkup(webAppUrl)
+	//replyKeyboardMarkup := getReplyKeyboardMarkup(webAppUrl)
+	inlineKeyboardMarkup := getInlineKeyboardMarkup(webAppUrl)
 
 	for {
-		updates, err := getUpdates(telegramBotToken, telegramApiUrl, offset)
+		updates, err := getUpdates(botToken, telegramApiUrl, offset)
 		if err != nil {
 			log.Println("Something went wrong: ", err.Error())
 		}
 
 		for _, update := range updates {
-			err = respond(telegramBotToken, telegramApiUrl, update, replyKeyboardMarkup)
+			//err = respond(botToken, telegramApiUrl, update, replyKeyboardMarkup)
+			err = respond(botToken, telegramApiUrl, update, inlineKeyboardMarkup)
 			if err != nil {
 				log.Println("respond doesn't work: ", err.Error())
 			}
@@ -65,7 +69,8 @@ func getUpdates(botToken string, apiUrl string, offset int) ([]Update, error) {
 }
 
 // Make and send responses
-func respond(botToken string, apiUrl string, update Update, replyKeyboardMarkup ReplyKeyboardMarkup) error {
+// func respond(botToken string, apiUrl string, update Update, replyKeyboardMarkup ReplyKeyboardMarkup) error {
+func respond(botToken string, apiUrl string, update Update, replyKeyboardMarkup InlineKeyboardMarkup) error {
 	var botMessage BotMessage
 	botMessage.ChatId = update.Message.Chat.Id
 	botMessage.Text = "You asked: " + update.Message.Text
@@ -103,4 +108,23 @@ func getReplyKeyboardMarkup(webAppUrl string) ReplyKeyboardMarkup {
 	}
 
 	return replyKeyboardMarkup
+}
+
+func getInlineKeyboardMarkup(webAppUrl string) InlineKeyboardMarkup {
+	webAppInfo := WebAppInfo{
+		Url: webAppUrl,
+	}
+
+	keyboardButton := InlineKeyboardButton{
+		Text:   "Open app",
+		WebApp: webAppInfo,
+	}
+
+	keyboardButtonRow := []InlineKeyboardButton{keyboardButton}
+
+	inlineKeyboardMarkup := InlineKeyboardMarkup{
+		Keyboard: [][]InlineKeyboardButton{keyboardButtonRow},
+	}
+
+	return inlineKeyboardMarkup
 }
